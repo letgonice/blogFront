@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <style>
+        .crumbs {
+            font-size: 14px;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#" style="display:flex;">
+                        汪玮的博客
+                    </a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#">首页</a></li>
+                        <li><a href="#">分类</a></li>
+                        <li><a href="#">标签</a></li>
+                        <li><a href="#">关于</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                aria-haspopup="true" aria-expanded="false">其他 <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">后台</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+        <div style="text-align:center;">
+            <h4 class="crumbs" id="crumbs" style="text-align:left;"></h4>
+            <h3 id="title"></h3>
+            <div id="subTitle" style="font-size: 14px; color: #999;">
+
+            </div>
+
+        </div>
+        <div class="content" id="content">
+
+        </div>
+        <hr>
+        <div class="footer" style="text-align:center;font-size: 14px; color: #999;margin:10px 0;">
+            首页 | 主站 | GitHub | Powered by hexo | Theme xoxo
+        </div>
+    </div>
+</body>
+<script src="./js/jquery.js"></script>
+<script src="./bootstrap/js/bootstrap.min.js"></script>
+<script src="./js/memont.js"></script>
+<script type="text/javascript">
+    // 1. 获取地址栏中查询字符串id
+    let reg = /\?id=(\d+)/
+    let [, id] = location.search.match(reg)
+    // 2. 发请求获取数据并渲染页面（前端渲染）
+    async function ArticleContent() {
+        let result = await $.get(`http://127.0.0.1:3400/api/articleContent?id=${id}`)
+        console.log(result);
+        let { title, content, cate_name, cate_id, add_date } = result[0]
+        add_date = moment(add_date).format('YYYY-MM-DD')
+        let html = `当前位置：<a href="/">首页</a> / <a href='/cate.html?cate_id=${cate_id}'>${cate_name}</a> / ${title}`
+        $("#crumbs").html(html)
+        $("#content").html(content)
+        $("#title").html(title)
+        $("#subTitle").text(` ${add_date} / 分类：${cate_name}`)
+    }
+    ArticleContent()
+</script>
+
+</html>

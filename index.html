@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="./css/base.css">
+	<style>
+		.content .item {
+			margin-top: 10px;
+			margin-bottom: 10px;
+		}
+
+		.content .item img {
+			width: 100%;
+			height: 100%;
+			box-shadow: 0px 0px 10px #ccc;
+
+		}
+
+		.content .item .title:hover {
+			text-decoration: underline;
+			cursor: pointer;
+		}
+
+
+		.content .item div:first-child:hover img {
+			opacity: 0.7;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+		}
+
+		.content .item .intro {
+			margin-top: 10px;
+			color: #ccc;
+			font-size: 14px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+						data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#" style="display:flex;">
+						汪玮的博客
+					</a>
+				</div>
+
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#">首页</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+								aria-haspopup="true" aria-expanded="false">分类 <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<!-- <li><a href="/cate.html?id=2">html</a></li>
+								<li><a href="/cate.html?id=2">css</a></li>
+								<li><a href="/cate.html?id=2">javascript</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="/cate.html?id=2">mysql</a></li>
+								<li><a href="/cate.html?id=2">Linux</a></li> -->
+							</ul>
+						</li>
+						<li><a href="/tags.html">标签</a></li>
+						<li><a href="/about.html">关于我</a></li>
+					</ul>
+				</div><!-- /.navbar-collapse -->
+			</div><!-- /.container-fluid -->
+		</nav>
+
+		<div class="content">
+			<h4>最新文章</h4>
+			<div class="artlist" id="artlist">
+				<!-- <div class='item row'>
+					<div class="col-md-2">
+						<img src="http://placehold.it/170x100/ff3333/ffffff?text=like%20you" alt="">
+					</div>
+					<div class="col-md-10">
+						<div class="date ">作者：admin 、 2019-12-08 、分类：前端</div>
+						<div class="title">这是介绍中vscode...</div>
+						<div class="intro">这是介绍中vscode这是介绍中vscode这是介绍中vscode...</div>
+					</div>
+					<hr>
+				</div> -->
+
+
+			</div>
+		</div>
+		<button type="button" class="btn  btn-block" id="btnmore">查看更多</button>
+		<hr>
+
+		<div class="footer" style="text-align:center;font-size: 14px; color: #999;margin:10px 0;">
+			首页 | 主站 | GitHub | created at 2020/02/4 | Powered by 汪玮
+		</div>
+	</div>
+</body>
+<script src="./js/jquery.js"></script>
+<script src="./bootstrap/js/bootstrap.min.js"></script>
+<!-- <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script> -->
+<script src="./js/layer.js"></script>
+<script src="./js/memont.js"></script>
+<script>
+	//初始化文章
+
+	let page = 1;
+	let pagesize = 4;
+	let isDone = false;
+	async function initializeArticle() {
+		let result = await $.get(`http://127.0.0.1:3400/api/loadArticle?page=${page}&pagesize=${pagesize}`)
+		if (result.length === 0) {
+			layer.msg('数据已经加载完毕了')
+			isDone = true;
+			return false;
+		}
+		console.log(result);
+		result.forEach((item) => {
+			let { add_date, cate_name, pic, title, username, content, id } = item;
+			add_date = moment(add_date).format('YYYY-MM-DD')
+			username = username ? username : '匿名'
+			pic = `http://127.0.0.1:3400/${pic}`
+			let article = ''
+			article += `	
+				<div class='item row'>
+					<div class="col-md-2">
+						<img src="${pic}" alt="" style='width:180px;height:100px'>
+					</div>
+					<div class="col-md-10">
+						<div class="date ">作者：${username} 、${add_date} 、分类：${cate_name}</div>
+						<a href="/detail.html?id=${id}" style='color:black'><div class="title">${title}...</div></a>
+					</div>
+					<hr>
+				</div>`
+			$('#artlist').append(article)
+		})
+	}
+
+	async function cate() {
+		let result = await $.get(`http://127.0.0.1:3400/api/cate`)
+		console.log(result);
+		let cateHtml = ''
+		result.forEach((item) => {
+			let { cate_id, cate_name } = item;
+			cateHtml += `<li><a href="/cate.html?cate_id=${cate_id}">${cate_name}</a></li>`
+		})
+		$('.dropdown-menu').html(cateHtml)
+	}
+	cate()
+
+	initializeArticle(page, pagesize)
+	$('#btnmore').click(function () {
+		if (isDone) {
+			layer.msg('加载完毕了，没有了')
+			return;
+		}
+		page++
+		initializeArticle(page, pagesize)
+		return;
+	})
+
+
+</script>
+
+</html>
